@@ -6,8 +6,7 @@
 using namespace std;
 
 const int MAX_YEARS = 30;
-const int purchaseYear = 2001;
-const double costPrice = 50 * 100000;
+double COST_PRICE;
 
 void readCSV(const string& filename, double growthRates[], double inflationRates[], int years[], int& numYears) {
     ifstream file(filename);
@@ -17,26 +16,23 @@ void readCSV(const string& filename, double growthRates[], double inflationRates
     }
     
     string line;
-    getline(file, line); // Skip the header line
+    getline(file, line);
 
     numYears = 0;
     while (getline(file, line)) {
         size_t pos = 0;
         string token;
         
-        // Extract year
         pos = line.find(',');
         token = line.substr(0, pos);
         years[numYears] = stoi(token.substr(6, 4));
         line.erase(0, pos + 1);
         
-        // Extract growth rate
         pos = line.find(',');
         token = line.substr(0, pos);
         growthRates[numYears] = stod(token);
         line.erase(0, pos + 1);
         
-        // Extract inflation rate
         inflationRates[numYears] = stod(line);
 
         numYears++;
@@ -49,20 +45,21 @@ void readCSV(const string& filename, double growthRates[], double inflationRates
     file.close();
 }
 
-double calculateSellingPrice(double costPrice, int endYear, const double growthRates[], const double inflationRates[], const int years[], int numYears, double& ltcg) {
+double calculateSellingPrice(double costPrice, int startYear, int endYear, const double growthRates[], const double inflationRates[], const int years[], int numYears, double& ltcg) {
     double adjustedCostPrice = costPrice;
     int startIndex = 0;
     int endIndex = 0;
     
     for (int i = 0; i < numYears; ++i) {
-        if (years[i] == purchaseYear) startIndex = i;
+        if (years[i] == startYear) 
+            startIndex = i;
         if (years[i] == endYear) {
             endIndex = i;
             break;
         }
     }
     
-    for (int i = startIndex; i < endIndex; ++i) {
+    for (int i = startIndex + 1; i < endIndex; ++i) {
         double growth = growthRates[i];
         double inflation = inflationRates[i];
         adjustedCostPrice *= (1 + (growth - inflation) / 100);
@@ -73,12 +70,16 @@ double calculateSellingPrice(double costPrice, int endYear, const double growthR
 }
 
 int main() {
-    int sellingYear;
+    int purchaseYear, sellingYear;
     double growthRates[MAX_YEARS], inflationRates[MAX_YEARS];
     int years[MAX_YEARS];
     int numYears;
 
-    cout << "Enter the year of selling: ";
+    cout << "Enter the cost price: ";
+    cin >> COST_PRICE;
+    cout << "Enter the purchase year: ";
+    cin >> purchaseYear;
+    cout << "Enter the selling year: ";
     cin >> sellingYear;
 
     readCSV("price-inflation.csv", growthRates, inflationRates, years, numYears);
@@ -89,14 +90,12 @@ int main() {
     }
 
     double ltcg;
-    double sellingPrice = calculateSellingPrice(costPrice, sellingYear, growthRates, inflationRates, years, numYears, ltcg);
+    double sellingPrice = calculateSellingPrice(COST_PRICE, purchaseYear, sellingYear, growthRates, inflationRates, years, numYears, ltcg);
     
-    // Calculate tax based on LTCG
-    double tax = max(0.0, ltcg * 0.20);  // Ensure tax is non-negative
+    double tax = max(0.0, ltcg * 0.20);
 
     cout << fixed << setprecision(2);
     cout << "Estimated Selling Price: Rs " << sellingPrice << endl;
-    cout << "Long-term Capital Gains (LTCG): Rs " << ltcg << endl;
     cout << "Long-term Capital Gains Tax (LTCG) to be paid: Rs " << tax << endl;
 
     return 0;
