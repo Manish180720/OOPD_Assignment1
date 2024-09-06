@@ -47,4 +47,31 @@ This is a basic program that helps you calculate the selling price of an asset a
 
 
 
-## 
+# LTCG Tax Calculator
+
+This program calculates Long-Term Capital Gains (LTCG) tax based on inflation-adjusted selling price using historical data from a CSV file.
+
+## Features
+
+- **Inflation Adjustment**: Computes selling price adjusted for inflation.
+- **LTCG Tax Calculation**: Calculates tax at a rate of 12.5% of the gain.
+
+## Requirements
+
+- A CSV file named `price-inflation.csv` with the following format:
+
+
+## How to Use
+
+1. **Prepare Data File**: Ensure `price-inflation.csv` is located in the same directory as the executable.
+
+2. **Compile the Code**: 
+ ```sh
+ g++ -o LTCGCalculator LTCGCalculator.cpp
+
+
+# Enter the purchase price (Rs): 100000
+# Enter the year of purchase: 2010
+# Enter the year of selling: 2024
+# Final selling price (inflation-adjusted): Rs 250000.00
+# LTCG Tax (12.5%): Rs 18750.00
